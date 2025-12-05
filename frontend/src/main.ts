@@ -5,7 +5,7 @@ const app = document.querySelector<HTMLDivElement>('#app');
 
 if (app) {
   app.innerHTML = `
-    <section class="hero relative">
+    <section class="hero relative !px-[24px]">
       <img src="/public/decor.svg" alt="" class="absolute inset-0 w-full h-full object-contain pointer-events-none" style="transform: scale(1.2);">
       
       <div class="content-center flex flex-col items-center relative z-10">
@@ -23,7 +23,7 @@ if (app) {
       </div>
     </section>
 
-    <h2 style="padding: 32px;">Kreator Sorotan Minggu Ini</h2>
+    <h2 class="pt-[24px] px-[24px]">Kreator Sorotan Minggu Ini</h2>
 
     <div class="section-grid mx-8">
       <div class="card">
