@@ -34,8 +34,8 @@ async function renderApp() {
 
   // Show loading state
   app.innerHTML = `
-    <section class="hero relative !px-[24px]">
-      <img src="/decor.svg" alt="" class="absolute inset-0 w-full h-full object-contain pointer-events-none" style="transform: scale(1.2);">
+    <section class="hero relative px-[24px]">
+      <img src="/decor.svg" class="absolute inset-0 w-full h-full object-contain pointer-events-none">
       
       <div class="content-center flex flex-col items-center relative z-10">
         <div class="box-border flex flex-row justify-center items-center w-48 h-8 px-4 rounded-full border border-gray-200 mb-4">
@@ -52,7 +52,7 @@ async function renderApp() {
       </div>
     </section>
 
-    <h2 class="">Kreator Sorotan Minggu Ini</h2>
+    <h2 class="pt-[24px] px-[24px]">Kreator Sorotan Minggu Ini</h2>
 
     <div class="section-grid">
       <div class="loading">Memuat kreator...</div>
