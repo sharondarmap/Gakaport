@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+  --font-heading: "Hanken Grotesk", sans-serif;
+  --font-body: "Hanken Grotesk", sans-serif;
+}
+
 .logo img {
   height: 40px;
   width: auto;
@@ -45,9 +52,9 @@
   gap: 24px;
 
   background: var(--neutral-100);
-  backdrop-filter: blur(22px);
+  /* backdrop-filter: blur(22px); */
   border-radius: 0 0 40px 40px;
-  box-shadow: var(--shadow-light);
+  /* box-shadow: var(--shadow-light); */
 
   position: fixed;
   left: 50%;
@@ -66,7 +73,8 @@
 
 .dropdown a {
   font-size: 20px;
-  font-weight: 600;
+  font-family: var(--font-heading);
+  /* font-weight: 600; */
   color: var(--neutral-900);
   text-decoration: none;
   padding-bottom: 6px;
