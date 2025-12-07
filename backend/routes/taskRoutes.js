@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
-const db = require('../db'); 
+const db = require('../db');
 
-// PUBLISH WORKS
-// dia gabungin: upload -> simpan -> set tier -> publish
+// PUBLISH WORKS (kept)
 router.post('/works/publish', upload.single('file'), (req, res) => {
     console.log('\nPUBLISH START');
 
@@ -18,7 +17,7 @@ router.post('/works/publish', upload.single('file'), (req, res) => {
         description: req.body.description,
         file_url: fakeUrl,
         status: 'published', 
-        price: parseInt(req.body.tier_price) 
+        price: parseInt(req.body.tier_price) || 0
     };
     
     db.works.push(newWork);
@@ -30,9 +29,7 @@ router.post('/works/publish', upload.single('file'), (req, res) => {
     res.json({ message: 'Sukses publish', data: newWork });
 });
 
-
-// DONATION TRANSACTIONS 
-// dia gabungin: cek saldo -> transfer -> kirim notif
+// DONATION TRANSACTIONS (kept)
 router.post('/donations', (req, res) => {
     console.log('\nDONASI START');
     const { donor_id, creator_id, amount } = req.body;
@@ -57,14 +54,107 @@ router.post('/donations', (req, res) => {
     }
 });
 
-// CREATOR PROFILE
+// --- New / adjusted endpoints for frontend ---
+
+// Featured creators
+router.get('/creators/featured', (req, res) => {
+    // For now return all creators; the frontend will pick featured on its side
+    res.json(db.creators || []);
+});
+
+// Search creators
+router.get('/creators/search', (req, res) => {
+    const q = (req.query.q || '').toString().toLowerCase();
+    if (!q) return res.json(db.creators || []);
+    const results = (db.creators || []).filter(c =>
+        (c.name || '').toLowerCase().includes(q) ||
+        (c.description || '').toLowerCase().includes(q) ||
+        (c.bio || '').toLowerCase().includes(q)
+    );
+    res.json(results);
+});
+
+// Creator profile (returns creator object)
 router.get('/creators/:id', (req, res) => {
-    const user = db.users.find(u => u.id === req.params.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    
-    const works = db.works.filter(w => w.creator_id === user.id);
-    
-    res.json({ creator: user, works: works });
+    const creator = (db.creators || []).find(c => c.id === req.params.id);
+    if (!creator) return res.status(404).json({ error: 'Creator not found' });
+    res.json(creator);
+});
+
+// Creator works
+router.get('/creators/:id/works', (req, res) => {
+    const works = (db.works || []).filter(w => w.creator_id === req.params.id);
+    res.json(works);
+});
+
+// Current user info
+router.get('/user/me', (req, res) => {
+    res.json(db.currentUser || null);
+});
+
+// Send "sleep" (donation)
+router.post('/sleep/send', (req, res) => {
+    const { fromUserId, toCreatorId, amount, message } = req.body;
+    const amt = parseInt(amount);
+    const user = db.currentUser && db.currentUser.id === fromUserId ? db.currentUser : null;
+
+    if (!user) {
+        return res.status(404).json({ error: 'Sender not found' });
+    }
+
+    if (user.sleepBalance < amt) {
+        return res.status(400).json({ error: 'Insufficient balance' });
+    }
+
+    // Deduct from sender
+    user.sleepBalance -= amt;
+
+    // Add to creator (if exists)
+    const creator = (db.creators || []).find(c => c.id === toCreatorId);
+    if (creator) {
+        creator.sleepBalance = (creator.sleepBalance || 0) + amt;
+        creator.sleepReceived = (creator.sleepReceived || 0) + amt;
+    }
+
+    // Add transaction
+    const tx = {
+        id: `t${Date.now()}`,
+        fromUserId,
+        fromUserName: user.name,
+        toCreatorId,
+        toCreatorName: creator ? creator.name : 'Unknown',
+        amount: amt,
+        timestamp: new Date().toISOString(),
+        message
+    };
+    db.transactions.unshift(tx);
+
+    res.json({ status: 'success', newBalance: user.sleepBalance, tx });
+});
+
+// Get sleep transactions for a user (sent or received)
+router.get('/sleep/transactions/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const results = (db.transactions || []).filter(t => t.fromUserId === userId || t.toCreatorId === userId);
+    res.json(results);
+});
+
+// Withdraw sleep (creator converts received into spendable balance)
+router.post('/sleep/withdraw', (req, res) => {
+    const { userId, amount } = req.body;
+    const amt = parseInt(amount);
+    // Support only currentUser for now
+    if (!db.currentUser || db.currentUser.id !== userId) {
+        return res.status(404).json({ error: 'User not found' });
+    }
+    const cu = db.currentUser;
+    if (!cu.creatorProfile || (cu.creatorProfile.sleepBalance || 0) < amt) {
+        return res.status(400).json({ error: 'Insufficient creator balance' });
+    }
+
+    cu.creatorProfile.sleepBalance -= amt;
+    cu.sleepBalance = (cu.sleepBalance || 0) + amt;
+    res.json({ status: 'success', newBalance: cu.sleepBalance });
 });
 
 module.exports = router;

@@ -1,7 +1,7 @@
 import { mockCurrentUser, mockCreators, mockTransactions } from '../data/creators';
 import type { User, SleepTransaction } from '../data/creators';
 
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 const API_BASE_URL = 'http://localhost:3000/api';
 
 export async function getCurrentUser(): Promise<User | null> {
@@ -68,8 +68,8 @@ export async function sendSleep(
     });
     
     if (!response.ok) {
-      const error = await response.json();
-      return { success: false, error: error.message };
+      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
+      return { success: false, error: error.message || 'Server error' };
     }
     
     const data = await response.json();

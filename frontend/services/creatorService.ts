@@ -1,7 +1,7 @@
 import type { Creator, CreatorWork } from '../data/creators';
 import { mockCreators, mockWorks } from '../data/creators';
 
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 const API_BASE_URL = 'http://localhost:3000/api';
 
 //Featured creators for homepage
@@ -31,7 +31,10 @@ export async function getCreatorById(id: string): Promise<Creator | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/creators/${id}`);
     if (!response.ok) throw new Error('Failed to fetch creator');
-    return await response.json();
+    const data = await response.json();
+    // Backend might return `{ creator: ..., works: [...] }` or just the creator object
+    if (data && data.creator) return data.creator;
+    return data;
   } catch (error) {
     console.error('Error fetching creator:', error);
     return null;
