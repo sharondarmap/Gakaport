@@ -58,7 +58,6 @@ router.post('/donations', (req, res) => {
 
 // Featured creators
 router.get('/creators/featured', (req, res) => {
-    // For now return all creators; the frontend will pick featured on its side
     res.json(db.creators || []);
 });
 
@@ -74,11 +73,63 @@ router.get('/creators/search', (req, res) => {
     res.json(results);
 });
 
-// Creator profile (returns creator object)
+// Helper: sum donations by user -> creator for the same month/year
+function donatedThisMonth(userId, creatorId) {
+    const now = new Date();
+    return (db.transactions || []).reduce((sum, t) => {
+        if (t.fromUserId !== userId) return sum;
+        if (t.toCreatorId !== creatorId) return sum;
+        if (!t.timestamp) return sum;
+        const txDate = new Date(t.timestamp);
+        if (txDate.getFullYear() === now.getFullYear() && txDate.getMonth() === now.getMonth()) {
+            return sum + (parseInt(t.amount, 10) || 0);
+        }
+        return sum;
+    }, 0);
+}
+
+// Creator profile (returns creator object).
+// If caller provides ?userId=..., also include exclusive status for that user:
+// { creator: {...}, exclusive: { required, donatedThisMonth, hasAccess } }
 router.get('/creators/:id', (req, res) => {
     const creator = (db.creators || []).find(c => c.id === req.params.id);
     if (!creator) return res.status(404).json({ error: 'Creator not found' });
-    res.json(creator);
+
+    // Prefer explicit ?userId=..., otherwise fall back to server current user (if present)
+    let userId = req.query.userId;
+    if (!userId && db.currentUser && db.currentUser.id) {
+        userId = db.currentUser.id;
+    }
+
+    if (!userId) {
+        // No user context — return plain creator object (backwards-compatible)
+        return res.json(creator);
+    }
+
+    const required = parseInt(creator.exclusiveUnlockPrice || 0, 10) || 0;
+    const donated = donatedThisMonth(userId, creator.id);
+    const hasAccess = required > 0 && donated >= required;
+
+    return res.json({
+        creator,
+        exclusive: {
+            required,
+            donatedThisMonth: donated,
+            hasAccess
+        }
+    });
+});
+
+// Allow creator (or admin) to set exclusive price (simple endpoint; no auth)
+router.post('/creators/:id/exclusive', (req, res) => {
+    const creator = (db.creators || []).find(c => c.id === req.params.id);
+    if (!creator) return res.status(404).json({ error: 'Creator not found' });
+
+    const price = parseInt(req.body.price, 10);
+    if (isNaN(price) || price < 0) return res.status(400).json({ error: 'Invalid price' });
+
+    creator.exclusiveUnlockPrice = price;
+    res.json({ status: 'success', creator });
 });
 
 // Creator works
@@ -116,7 +167,7 @@ router.post('/sleep/send', (req, res) => {
         creator.sleepReceived = (creator.sleepReceived || 0) + amt;
     }
 
-    // Add transaction
+    // Add transaction with timestamp (ISO)
     const tx = {
         id: `t${Date.now()}`,
         fromUserId,

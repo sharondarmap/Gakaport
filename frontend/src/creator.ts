@@ -46,22 +46,39 @@ function createWorkCard(work: CreatorWork): string {
 }
 
 // Create premium work card (locked) with design system styling
-function createPremiumWorkCard(work: CreatorWork): string {
-  const genresBadges = work.genres.map((genre) => `<span class="badge">${genre}</span>`).join("")
+// If `unlocked` is true, render it as a normal clickable work card.
+function createPremiumWorkCard(work: CreatorWork, unlocked = false): string {
+  const genresBadges = work.genres.map((genre) => `<span class="badge">${genre}</span>`).join("");
 
+  if (unlocked) {
+    // Render same as free work card (clickable)
+    return `
+      <div class="card-works">
+        <a href="/work.html?id=${work.id}" class="card-link">
+          <div class="card-works-image-container">
+            <img src="${work.cover}" alt="${work.title}" />
+            <div class="card-works-badges">
+              ${genresBadges}
+            </div>
+          </div>
+          <div class="card-works-content">
+            <h3 class="card-works-title">${work.title}</h3>
+            <p class="card-works-sub">${work.status || "Ongoing"}</p>
+          </div>
+        </a>
+      </div>
+    `;
+  }
+
+  // Locked appearance (non-clickable)
   return `
     <div class="card-works card-works-locked">
       <a href="#" class="card-link" onclick="return false;">
         <div class="card-works-image-container">
-          <img 
-            src="${work.cover}" 
-            alt="${work.title}" 
-            style="filter: brightness(0.5);"
-          />
+          <img src="${work.cover}" alt="${work.title}" style="filter: brightness(0.5);" />
           <div class="card-works-badges">
             ${genresBadges}
           </div>
-          <!-- Lock icon overlay for premium cards -->
           <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3);">
             <svg class="w-8 h-8 text-white" style="width: 32px; height: 32px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -75,13 +92,15 @@ function createPremiumWorkCard(work: CreatorWork): string {
         </div>
       </a>
     </div>
-  `
+  `;
 }
 
-// Render creator profile
 function renderCreatorProfile(creator: Creator, works: CreatorWork[]): string {
   const freeWorks = works.filter((w) => !w.isPremium)
   const premiumWorks = works.filter((w) => w.isPremium)
+
+  // Detect whether current user has exclusive access (backend attaches this to creator.exclusive)
+  const hasExclusiveAccess = !!((creator as any).exclusive && (creator as any).exclusive.hasAccess)
 
   const freeWorksSection =
     freeWorks.length > 0
@@ -101,7 +120,7 @@ function renderCreatorProfile(creator: Creator, works: CreatorWork[]): string {
     <section class="space-y-4">
       <h2 class="heading-2 mx-[24px]" style="color: var(--primary-blue);">Karya Eksklusif</h2>
       <div class="section-grid">
-        ${premiumWorks.map(createPremiumWorkCard).join("")}
+        ${premiumWorks.map((w) => createPremiumWorkCard(w, hasExclusiveAccess)).join("")}
       </div>
     </section>
   `

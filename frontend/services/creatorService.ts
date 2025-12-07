@@ -22,7 +22,7 @@ export async function getFeaturedCreators(): Promise<Creator[]> {
 }
 
 // Get single creator by ID
-export async function getCreatorById(id: string): Promise<Creator | null> {
+export async function getCreatorById(id: string): Promise<any> {
   if (USE_MOCK_DATA) {
     await new Promise(resolve => setTimeout(resolve, 500));
     return mockCreators.find(c => c.id === id) || null;
@@ -32,8 +32,18 @@ export async function getCreatorById(id: string): Promise<Creator | null> {
     const response = await fetch(`${API_BASE_URL}/creators/${id}`);
     if (!response.ok) throw new Error('Failed to fetch creator');
     const data = await response.json();
-    // Backend might return `{ creator: ..., works: [...] }` or just the creator object
-    if (data && data.creator) return data.creator;
+
+    // If backend returns { creator, exclusive } attach exclusive info onto the creator object
+    if (data && data.creator) {
+      const creator = data.creator;
+      if (data.exclusive) {
+        // attach exclusive meta to the creator object so frontend can read creator.exclusive
+        (creator as any).exclusive = data.exclusive;
+      }
+      return creator;
+    }
+
+    // Backend might return the creator object directly
     return data;
   } catch (error) {
     console.error('Error fetching creator:', error);
