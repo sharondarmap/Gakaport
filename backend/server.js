@@ -19,6 +19,10 @@ app.use('/internal', utilityRoutes);
 // layer publik, ni buat dipake FE pake nya ini, atur dah
 app.use('/api', taskRoutes);
 
-app.listen(port, () => {
+if (require.main === module) {
+  app.listen(port, () => {
     console.log(`GakaPort Backend is running on http://localhost:${port}`);
-});
+  });
+} else {
+  module.exports = app;
+}

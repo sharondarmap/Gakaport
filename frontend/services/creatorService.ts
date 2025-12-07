@@ -2,7 +2,7 @@ import type { Creator, CreatorWork } from '../data/creators';
 import { mockCreators, mockWorks } from '../data/creators';
 
 const USE_MOCK_DATA = false;
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 //Featured creators for homepage
 export async function getFeaturedCreators(): Promise<Creator[]> {

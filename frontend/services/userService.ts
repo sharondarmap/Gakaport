@@ -2,7 +2,7 @@ import { mockCurrentUser, mockCreators, mockTransactions } from '../data/creator
 import type { User, SleepTransaction } from '../data/creators';
 
 const USE_MOCK_DATA = false;
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 export async function getCurrentUser(): Promise<User | null> {
   if (USE_MOCK_DATA) {

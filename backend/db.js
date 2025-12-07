@@ -85,7 +85,7 @@ const db = {
 
       { id: 'w10', creator_id: '2', title: 'Hujan di Bulan Juni', cover: '/image2.png', description: 'Kisah cinta', genres: ['Drama','Romance'], status: 'Ongoing', isPremium: false },
       { id: 'w11', creator_id: '3', title: 'Kopi Pagi', cover: '/viralhit.png', description: 'Cerita kedai kopi', genres: ['Comedy','Slice of life'], status: 'Ongoing', isPremium: false },
-      { id: 'w12', creator_id: 'current-user', title: 'My Journey', cover: '/thescream.png', description: 'Personal art journey', genres: ['Art'], status: 'Ongoing', isPremium: false }
+      { id: 'w12', creator_id: 'current-user', title: 'My Journey', cover: '/thescream.jpg', description: 'Personal art journey', genres: ['Art'], status: 'Ongoing', isPremium: false }
     ],
 
     // Sleep / donation transactions
