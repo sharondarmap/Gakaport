@@ -1,9 +1,7 @@
 import './style.css'
 import loadNavbar from "./components/navbar";
 import { getFeaturedCreators } from "../services/creatorService";
-import type { Creator } from "../data/creators"; // Add 'type' keyword
-
-// rest of the code remains the same
+import type { Creator } from "../data/creators";
 
 loadNavbar();
 

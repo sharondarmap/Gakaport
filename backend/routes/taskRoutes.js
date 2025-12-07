@@ -4,7 +4,7 @@ const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 const db = require('../db');
 
-// PUBLISH WORKS (kept)
+// public works
 router.post('/works/publish', upload.single('file'), (req, res) => {
     console.log('\nPUBLISH START');
 
@@ -29,7 +29,7 @@ router.post('/works/publish', upload.single('file'), (req, res) => {
     res.json({ message: 'Sukses publish', data: newWork });
 });
 
-// DONATION TRANSACTIONS (kept)
+// donation transactions
 router.post('/donations', (req, res) => {
     console.log('\nDONASI START');
     const { donor_id, creator_id, amount } = req.body;
@@ -54,8 +54,6 @@ router.post('/donations', (req, res) => {
     }
 });
 
-// --- New / adjusted endpoints for frontend ---
-
 // Featured creators
 router.get('/creators/featured', (req, res) => {
     res.json(db.creators || []);
@@ -73,7 +71,7 @@ router.get('/creators/search', (req, res) => {
     res.json(results);
 });
 
-// Helper: sum donations by user -> creator for the same month/year
+//sum donations by user
 function donatedThisMonth(userId, creatorId) {
     const now = new Date();
     return (db.transactions || []).reduce((sum, t) => {
@@ -88,21 +86,17 @@ function donatedThisMonth(userId, creatorId) {
     }, 0);
 }
 
-// Creator profile (returns creator object).
-// If caller provides ?userId=..., also include exclusive status for that user:
-// { creator: {...}, exclusive: { required, donatedThisMonth, hasAccess } }
+// Get creator details, including exclusive access info
 router.get('/creators/:id', (req, res) => {
     const creator = (db.creators || []).find(c => c.id === req.params.id);
     if (!creator) return res.status(404).json({ error: 'Creator not found' });
 
-    // Prefer explicit ?userId=..., otherwise fall back to server current user (if present)
     let userId = req.query.userId;
     if (!userId && db.currentUser && db.currentUser.id) {
         userId = db.currentUser.id;
     }
 
     if (!userId) {
-        // No user context — return plain creator object (backwards-compatible)
         return res.json(creator);
     }
 
@@ -120,7 +114,6 @@ router.get('/creators/:id', (req, res) => {
     });
 });
 
-// Allow creator (or admin) to set exclusive price (simple endpoint; no auth)
 router.post('/creators/:id/exclusive', (req, res) => {
     const creator = (db.creators || []).find(c => c.id === req.params.id);
     if (!creator) return res.status(404).json({ error: 'Creator not found' });

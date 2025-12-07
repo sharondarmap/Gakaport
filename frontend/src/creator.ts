@@ -46,12 +46,11 @@ function createWorkCard(work: CreatorWork): string {
 }
 
 // Create premium work card (locked) with design system styling
-// If `unlocked` is true, render it as a normal clickable work card.
+// If unlocked is true, render it as a normal clickable work card.
 function createPremiumWorkCard(work: CreatorWork, unlocked = false): string {
   const genresBadges = work.genres.map((genre) => `<span class="badge">${genre}</span>`).join("");
 
   if (unlocked) {
-    // Render same as free work card (clickable)
     return `
       <div class="card-works">
         <a href="/work.html?id=${work.id}" class="card-link">

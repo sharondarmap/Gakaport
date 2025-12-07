@@ -33,17 +33,14 @@ export async function getCreatorById(id: string): Promise<any> {
     if (!response.ok) throw new Error('Failed to fetch creator');
     const data = await response.json();
 
-    // If backend returns { creator, exclusive } attach exclusive info onto the creator object
     if (data && data.creator) {
       const creator = data.creator;
       if (data.exclusive) {
-        // attach exclusive meta to the creator object so frontend can read creator.exclusive
         (creator as any).exclusive = data.exclusive;
       }
       return creator;
     }
 
-    // Backend might return the creator object directly
     return data;
   } catch (error) {
     console.error('Error fetching creator:', error);

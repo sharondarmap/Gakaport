@@ -83,7 +83,6 @@ export async function sendSleep(
 export async function getSleepTransactions(userId: string): Promise<SleepTransaction[]> {
   if (USE_MOCK_DATA) {
     await new Promise(resolve => setTimeout(resolve, 300));
-    // Return transactions where user is sender or receiver
     return mockTransactions.filter(
       t => t.fromUserId === userId || t.toCreatorId === userId
     );
@@ -103,11 +102,9 @@ export async function withdrawSleep(userId: string, amount: number): Promise<boo
   if (USE_MOCK_DATA) {
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Check if user is creator and has enough received balance
     if (mockCurrentUser.isCreator && mockCurrentUser.creatorProfile) {
       const creatorBalance = mockCurrentUser.creatorProfile.sleepBalance || 0;
       if (creatorBalance >= amount) {
-        // Convert received sleep to spendable balance
         mockCurrentUser.sleepBalance += amount;
         if (mockCurrentUser.creatorProfile.sleepBalance !== undefined) {
           mockCurrentUser.creatorProfile.sleepBalance -= amount;
