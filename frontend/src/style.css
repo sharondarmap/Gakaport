@@ -17,6 +17,7 @@
 
   /* Accent Blues */
   --blue-low-opacity: #4a86e732;
+  --blue-100: #DEEAFB;
   --blue-500: #4a87e7;
   --blue-700: #2a52be;
   --blue-900: #273f81;
@@ -203,6 +204,86 @@ h2, .heading-2 {
   background: var(--blue-low-opacity);
   margin-right: 6px;
   color: var(--blue-700);
+}
+
+.card-works {
+  width: 100%;
+  max-width: 220px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.25s ease;
+  position: relative;
+}
+
+.card-works:hover {
+  transform: translateY(-6px);
+  scale: 1.02;
+}
+
+/* Image container with position relative for badge overlay */
+.card-works-image-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.card-works-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Badge positioned as overlay on top-right of image */
+.card-works-badges {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.card-works-badges .badge {
+  display: inline-flex;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: var(--radius-lg);
+  background: var(--blue-100);
+  color: var(--blue-700);
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+.card-works-content {
+  padding: 16px;
+}
+
+.card-works-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--neutral-900);
+  line-height: 1.3;
+}
+
+.card-works-sub {
+  font-size: 14px;
+  margin-top: 6px;
+  color: var(--neutral-600);
+  margin: 0;
+}
+
+.card-works-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.card-works-locked {
+  opacity: 0.9;
 }
 
 /* Grids for content sections */

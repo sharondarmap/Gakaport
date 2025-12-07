@@ -10,6 +10,7 @@ export interface Creator {
   joinDate?: string;
   sleepBalance?: number;
   sleepReceived?: number;
+  exclusiveUnlockPrice: number;
   socialLinks?: {
     instagram?: string;
     twitter?: string;
@@ -56,7 +57,8 @@ export const mockCurrentUser: User = {
     works: 3,
     joinDate: '2023-01-15',
     sleepBalance: 2400,
-    sleepReceived: 2400
+    sleepReceived: 2400,
+    exclusiveUnlockPrice: 10
   }
 };
 
@@ -73,6 +75,7 @@ export const mockCreators: Creator[] = [
     joinDate: '2020-05-15',
     sleepBalance: 8900,
     sleepReceived: 8900,
+    exclusiveUnlockPrice: 15, // Requires 15 sleep support to unlock exclusives
     socialLinks: {
       instagram: 'https://instagram.com/rakawirayudha',
       twitter: 'https://twitter.com/rakawirayudha'
@@ -89,7 +92,8 @@ export const mockCreators: Creator[] = [
     works: 5,
     joinDate: '2021-03-20',
     sleepBalance: 6700,
-    sleepReceived: 6700
+    sleepReceived: 6700,
+    exclusiveUnlockPrice: 10
   },
   {
     id: '3',
@@ -102,7 +106,8 @@ export const mockCreators: Creator[] = [
     works: 12,
     joinDate: '2019-11-10',
     sleepBalance: 12300,
-    sleepReceived: 12300
+    sleepReceived: 12300,
+    exclusiveUnlockPrice: 20
   }
 ];
 
